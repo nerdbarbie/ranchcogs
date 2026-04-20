@@ -1,0 +1,16 @@
+{
+    "name": "ImposterGate",
+    "short": "Kicks members who change their name to match blocked admin/staff patterns.",
+    "description": "Automatically removes members who change their username or display name to something matching a configurable set of regex patterns, protecting against admin/staff impersonation. Admins and whitelisted moderator roles are never kicked.",
+    "end_user_data_statement": "This cog does not persistently store any end-user data. Member IDs and usernames are logged transiently to the bot's logger and, if configured, to a guild audit-log channel.",
+    "author": ["ranchcogs"],
+    "install_msg": "Thanks for installing ImposterGate!\n\n**Required:** Enable the Server Members privileged intent in the Discord Developer Portal and in your bot's intents. The bot also needs the Kick Members permission with a role above those it will kick.\n\nLoad with: `[p]load impostergate`\nThen use `/usernameguard status` to verify it is active.",
+    "required_cogs": {},
+    "requirements": [],
+    "tags": ["moderation", "security", "antispoof", "username"],
+    "min_bot_version": "3.5.0",
+    "min_python_version": [3, 9, 0],
+    "hidden": false,
+    "disabled": false,
+    "type": "COG"
+}
