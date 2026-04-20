@@ -131,7 +131,7 @@ def _truncated_list(lines: list[str], limit: int = _LIST_TRUNCATE_AT) -> str:
 # Cog
 # ---------------------------------------------------------------------------
 
-class ImposterGate(commands.Cog):
+class ImposterGate(commands.Cog, name="ImposterGate"):
     """
     Watches for username / display-name changes and kicks members whose new
     name matches a blocked regex pattern, unless they hold a whitelisted role
