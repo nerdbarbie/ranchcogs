@@ -222,14 +222,6 @@ class TurdKick(commands.Cog):
 
         reason = guild_config["kick_reason"]
 
-        # Attempt to DM the member before kicking
-        try:
-            await after.send(
-                f"You have been removed from **{guild.name}**.\nReason: {reason}"
-            )
-        except (discord.Forbidden, discord.HTTPException):
-            pass  # DMs disabled or blocked — proceed with kick anyway
-
         # Perform the kick
         kick_succeeded = False
         kick_failed_reason = "Unknown error."
