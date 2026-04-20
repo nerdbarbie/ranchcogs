@@ -23,6 +23,10 @@ LOADING
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     await bot.load_extension("cogs.impostergate.impostergate")
 
+    Or with Red's downloader:
+        [p]cog install ranchcogs impostergate
+        [p]load impostergate
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PERSISTENCE NOTE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -39,8 +43,8 @@ import re
 from typing import Optional
 
 import discord
-from discord import app_commands
-from discord.ext import commands
+from redbot.core import commands
+from redbot.core.bot import Red
 
 log = logging.getLogger(__name__)
 
@@ -137,7 +141,7 @@ class ImposterGate(commands.Cog):
     on_user_update (global username changes) to cover all name-change vectors.
     """
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Red) -> None:
         self.bot = bot
 
         # Mutable runtime state — modified via slash commands.
@@ -331,167 +335,167 @@ class ImposterGate(commands.Cog):
                 await self._enforce(member, changed)
 
     # ------------------------------------------------------------------
-    # Slash commands  (Administrator permission required)
+    # Prefix commands  (Red-style, admin only)
     # ------------------------------------------------------------------
 
-    guard_group = app_commands.Group(
-        name="impostergate",
-        description="Manage the ImposterGate cog.",
-        default_permissions=discord.Permissions(administrator=True),
-        guild_only=True,
-    )
+    @commands.group(name="impostergate", invoke_without_command=True)
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def impostergate(self, ctx: commands.Context) -> None:
+        """Manage the ImposterGate username-spoof protection cog."""
+        await ctx.send_help(ctx.command)
 
     # ── Pattern management ──────────────────────────────────────────────
 
-    @guard_group.command(name="list_patterns", description="List all blocked regex patterns.")
-    async def list_patterns(self, interaction: discord.Interaction) -> None:
+    @impostergate.command(name="listpatterns")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def list_patterns(self, ctx: commands.Context) -> None:
+        """List all blocked regex patterns."""
         if not self._blocked_patterns:
-            await interaction.response.send_message(
-                "No blocked patterns configured.", ephemeral=True
-            )
+            await ctx.send("No blocked patterns configured.")
             return
         lines = [f"``{p}``" for p in self._blocked_patterns]
         body = _truncated_list(lines)
-        await interaction.response.send_message(
-            f"**Blocked patterns ({len(self._blocked_patterns)}):**\n{body}",
-            ephemeral=True,
-        )
+        await ctx.send(f"**Blocked patterns ({len(self._blocked_patterns)}):**\n{body}")
 
-    @guard_group.command(name="add_pattern", description="Add a new blocked regex pattern.")
-    @app_commands.describe(pattern="The regex pattern to block (case-insensitive).")
-    async def add_pattern(self, interaction: discord.Interaction, pattern: str) -> None:
+    @impostergate.command(name="addpattern")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def add_pattern(self, ctx: commands.Context, *, pattern: str) -> None:
+        """Add a new blocked regex pattern (case-insensitive).
+
+        Example: `[p]impostergate addpattern \\bsupport\\b`
+        """
         if len(pattern) > _MAX_PATTERN_LEN:
-            await interaction.response.send_message(
-                f"❌ Pattern too long ({len(pattern)} chars). Maximum is {_MAX_PATTERN_LEN}.",
-                ephemeral=True,
+            await ctx.send(
+                f"❌ Pattern too long ({len(pattern)} chars). Maximum is {_MAX_PATTERN_LEN}."
             )
             return
         try:
             re.compile(pattern, re.IGNORECASE)
         except re.error as exc:
-            await interaction.response.send_message(
-                f"❌ Invalid regex: `{exc}`", ephemeral=True
-            )
+            await ctx.send(f"❌ Invalid regex: `{exc}`")
             return
         if pattern in self._blocked_patterns:
-            await interaction.response.send_message(
-                "Pattern already exists.", ephemeral=True
-            )
+            await ctx.send("Pattern already exists.")
             return
         self._blocked_patterns.append(pattern)
         self._rebuild_compiled()
-        await interaction.response.send_message(
-            f"✅ Pattern ``{pattern}`` added.", ephemeral=True
-        )
+        await ctx.send(f"✅ Pattern ``{pattern}`` added.")
 
-    @guard_group.command(name="remove_pattern", description="Remove a blocked regex pattern.")
-    @app_commands.describe(pattern="The exact pattern string to remove.")
-    async def remove_pattern(self, interaction: discord.Interaction, pattern: str) -> None:
+    @impostergate.command(name="removepattern")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def remove_pattern(self, ctx: commands.Context, *, pattern: str) -> None:
+        """Remove a blocked regex pattern.
+
+        Example: `[p]impostergate removepattern \\bsupport\\b`
+        """
         if pattern not in self._blocked_patterns:
-            await interaction.response.send_message("Pattern not found.", ephemeral=True)
+            await ctx.send("Pattern not found.")
             return
         self._blocked_patterns.remove(pattern)
         self._rebuild_compiled()
-        await interaction.response.send_message(
-            f"✅ Pattern ``{pattern}`` removed.", ephemeral=True
-        )
+        await ctx.send(f"✅ Pattern ``{pattern}`` removed.")
 
-    @guard_group.command(
-        name="test_name", description="Test whether a name would be blocked."
-    )
-    @app_commands.describe(name="The username / display name to test.")
-    async def test_name(self, interaction: discord.Interaction, name: str) -> None:
+    @impostergate.command(name="testname")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def test_name(self, ctx: commands.Context, *, name: str) -> None:
+        """Test whether a name would be blocked without taking any action.
+
+        Example: `[p]impostergate testname Server Admin`
+        """
         matched = _matches_any(name, self._compiled)
         safe_name = discord.utils.escape_markdown(name)
         if matched:
-            await interaction.response.send_message(
-                f"🚫 `{safe_name}` **would be blocked** — matched pattern ``{matched}``.",
-                ephemeral=True,
+            await ctx.send(
+                f"🚫 `{safe_name}` **would be blocked** — matched pattern ``{matched}``."
             )
         else:
-            await interaction.response.send_message(
-                f"✅ `{safe_name}` would **not** be blocked.",
-                ephemeral=True,
-            )
+            await ctx.send(f"✅ `{safe_name}` would **not** be blocked.")
 
     # ── Whitelist management ────────────────────────────────────────────
 
-    @guard_group.command(name="list_roles", description="List whitelisted role names.")
-    async def list_roles(self, interaction: discord.Interaction) -> None:
+    @impostergate.command(name="listroles")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def list_roles(self, ctx: commands.Context) -> None:
+        """List all whitelisted role names."""
         if not self._whitelisted_role_names_display:
-            await interaction.response.send_message(
-                "No whitelisted roles configured.", ephemeral=True
-            )
+            await ctx.send("No whitelisted roles configured.")
             return
         lines = [f"• {r}" for r in self._whitelisted_role_names_display]
         body = _truncated_list(lines)
-        await interaction.response.send_message(
-            f"**Whitelisted roles ({len(self._whitelisted_role_names_display)}):**\n{body}",
-            ephemeral=True,
+        await ctx.send(
+            f"**Whitelisted roles ({len(self._whitelisted_role_names_display)}):**\n{body}"
         )
 
-    @guard_group.command(name="add_role", description="Whitelist a role.")
-    @app_commands.describe(role="The role to whitelist.")
-    async def add_role(
-        self, interaction: discord.Interaction, role: discord.Role
-    ) -> None:
+    @impostergate.command(name="addrole")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def add_role(self, ctx: commands.Context, *, role: discord.Role) -> None:
+        """Whitelist a role so its members are never kicked.
+
+        Example: `[p]impostergate addrole Moderator`
+        """
         role_lower = role.name.lower()
         if role_lower in self._whitelisted_role_names:
-            await interaction.response.send_message(
-                "Role already whitelisted.", ephemeral=True
-            )
+            await ctx.send("Role already whitelisted.")
             return
         self._whitelisted_role_names.add(role_lower)
         self._whitelisted_role_names_display.append(role.name)
-        await interaction.response.send_message(
-            f"✅ Role **{role.name}** whitelisted.", ephemeral=True
-        )
+        await ctx.send(f"✅ Role **{role.name}** whitelisted.")
 
-    @guard_group.command(name="remove_role", description="Remove a role from the whitelist.")
-    @app_commands.describe(role="The role to remove from the whitelist.")
-    async def remove_role(
-        self, interaction: discord.Interaction, role: discord.Role
-    ) -> None:
+    @impostergate.command(name="removerole")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def remove_role(self, ctx: commands.Context, *, role: discord.Role) -> None:
+        """Remove a role from the whitelist.
+
+        Example: `[p]impostergate removerole Moderator`
+        """
         role_lower = role.name.lower()
         if role_lower not in self._whitelisted_role_names:
-            await interaction.response.send_message(
-                "Role not in whitelist.", ephemeral=True
-            )
+            await ctx.send("Role not in whitelist.")
             return
         self._whitelisted_role_names.discard(role_lower)
-        # Remove by lowercase comparison so display list stays in sync.
         self._whitelisted_role_names_display = [
             n for n in self._whitelisted_role_names_display if n.lower() != role_lower
         ]
-        await interaction.response.send_message(
-            f"✅ Role **{role.name}** removed from whitelist.", ephemeral=True
-        )
+        await ctx.send(f"✅ Role **{role.name}** removed from whitelist.")
 
     # ── Log channel ─────────────────────────────────────────────────────
 
-    @guard_group.command(
-        name="set_log_channel", description="Set the channel for audit log messages."
-    )
-    @app_commands.describe(channel="The text channel to send log messages to.")
+    @impostergate.command(name="logchannel")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
     async def set_log_channel(
-        self, interaction: discord.Interaction, channel: discord.TextChannel
+        self, ctx: commands.Context, channel: discord.TextChannel
     ) -> None:
-        self._log_channel_id = channel.id
-        await interaction.response.send_message(
-            f"✅ Log channel set to {channel.mention}.", ephemeral=True
-        )
+        """Set a channel for audit log messages.
 
-    @guard_group.command(
-        name="clear_log_channel", description="Stop sending audit log messages."
-    )
-    async def clear_log_channel(self, interaction: discord.Interaction) -> None:
+        Example: `[p]impostergate logchannel #mod-logs`
+        """
+        self._log_channel_id = channel.id
+        await ctx.send(f"✅ Log channel set to {channel.mention}.")
+
+    @impostergate.command(name="clearlogchannel")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def clear_log_channel(self, ctx: commands.Context) -> None:
+        """Stop sending audit log messages."""
         self._log_channel_id = None
-        await interaction.response.send_message("✅ Log channel cleared.", ephemeral=True)
+        await ctx.send("✅ Log channel cleared.")
 
     # ── Status ───────────────────────────────────────────────────────────
 
-    @guard_group.command(name="status", description="Show the current configuration.")
-    async def status(self, interaction: discord.Interaction) -> None:
+    @impostergate.command(name="status")
+    @commands.admin_or_permissions(administrator=True)
+    @commands.guild_only()
+    async def status(self, ctx: commands.Context) -> None:
+        """Show the current ImposterGate configuration."""
         embed = discord.Embed(
             title="🛡️ ImposterGate — Status",
             colour=discord.Colour.blurple(),
@@ -509,12 +513,12 @@ class ImposterGate(commands.Cog):
         log_ch = f"<#{self._log_channel_id}>" if self._log_channel_id else "Not set"
         embed.add_field(name="Log channel", value=log_ch, inline=True)
         embed.set_footer(text="Admins and guild owner are always whitelisted.")
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await ctx.send(embed=embed)
 
 
 # ---------------------------------------------------------------------------
 # Setup hook
 # ---------------------------------------------------------------------------
 
-async def setup(bot: commands.Bot) -> None:
+async def setup(bot: Red) -> None:
     await bot.add_cog(ImposterGate(bot))
