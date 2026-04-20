@@ -1,0 +1,9 @@
+{
+    "author": [
+        "nerdbarbie"
+    ],
+    "description": "Ranch Cogs — a collection of moderation and utility cogs for Red-DiscordBot.",
+    "install_msg": "Thanks for installing a Ranch Cog! Check each cog's folder for setup instructions.",
+    "index_name": "ranchcogs",
+    "short": "Ranch Cogs collection"
+}
