@@ -1,0 +1,15 @@
+{
+    "name": "TurdKick",
+    "short": "Auto-kick members who receive a designated trap role.",
+    "description": "Watches for a configurable trap role being assigned to any member and automatically kicks them. Includes optional DM notification, audit log reason, and a dedicated log channel.",
+    "version": "1.0.0",
+    "author": ["YourNameHere"],
+    "install_msg": "TurdKick loaded! Use `[p]turdkick role @role` to set your trap role, then `[p]turdkick status` to verify the config.",
+    "required_cogs": {},
+    "requirements": [],
+    "tags": ["moderation", "kick", "trap", "autorole"],
+    "min_bot_version": "3.5.0",
+    "hidden": false,
+    "disabled": false,
+    "type": "COG"
+}
