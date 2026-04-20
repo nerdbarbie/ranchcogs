@@ -1,9 +1,26 @@
 {
-    "author": [
-        "nerdbarbie"
-    ],
-    "description": "Ranch Cogs — a collection of moderation and utility cogs for Red-DiscordBot.",
-    "install_msg": "Thanks for installing a Ranch Cog! Check each cog's folder for setup instructions.",
-    "index_name": "ranchcogs",
-    "short": "Ranch Cogs collection"
+    "author": ["nerdbarbie"],
+    "description": "Ranch Cogs",
+    "install_msg": "Thanks for installing Ranch Cogs!",
+    "short": "Ranch Cogs",
+    "cogs": {
+        "impostergate": {
+            "author": ["nerdbarbie"],
+            "description": "...",
+            "short": "...",
+            "min_bot_version": "3.5.0"
+        },
+        "turdkick": {
+            "author": ["nerdbarbie"],
+            "description": "...",
+            "short": "...",
+            "min_bot_version": "3.5.0"
+        },
+        "cattleguard": {
+            "author": ["nerdbarbie"],
+            "description": "Role management: default role assignment and inactivity-based role transitions.",
+            "short": "Inactivity-based role management.",
+            "min_bot_version": "3.5.0"
+        }
+    }
 }
