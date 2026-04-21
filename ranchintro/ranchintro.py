@@ -191,33 +191,33 @@ class RanchIntro(commands.Cog):
         await self.config.guild(ctx.guild).watch_channel.set(channel.id)
         await ctx.send(f"✅ Watch channel set to {channel.mention}.")
 
-    @ranchintro.command(name="setwelcomechannel")
+    @ranchintro.command(name="setpostchannel")
     async def ri_set_welcome_channel(self, ctx: commands.Context, channel: discord.TextChannel):
         """
         Set the public channel where welcome embeds are posted.
 
-        Example: `[p]ri setwelcomechannel #general`
+        Example: `[p]ri setpostchannel #general`
         """
         await self.config.guild(ctx.guild).welcome_channel.set(channel.id)
         await ctx.send(f"✅ Welcome channel set to {channel.mention}.")
 
-    @ranchintro.command(name="setnewmemberrole")
+    @ranchintro.command(name="setremoverole")
     async def ri_set_new_member_role(self, ctx: commands.Context, role: discord.Role):
         """
         Set the role new members have before introducing themselves (will be removed on intro).
 
-        Example: `[p]ri setnewmemberrole Newcomer`
+        Example: `[p]ri setremoverole Newcomer`
         """
         await self.config.guild(ctx.guild).new_member_role.set(role.id)
         await ctx.send(f"✅ New member role set to **{role.name}**.")
 
-    @ranchintro.command(name="setactiverole")
+    @ranchintro.command(name="setaddrole")
     async def ri_set_active_role(self, ctx: commands.Context, role: discord.Role):
         """
         Set the role assigned when a member posts their introduction.
         This role also acts as the \"already introduced\" check.
 
-        Example: `[p]ri setactiverole Member`
+        Example: `[p]ri setaddrole Member`
         """
         await self.config.guild(ctx.guild).active_role.set(role.id)
         await ctx.send(f"✅ Active role set to **{role.name}**.")
