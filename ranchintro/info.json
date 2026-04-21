@@ -1,0 +1,12 @@
+{
+    "name": "RanchIntro",
+    "short": "Welcomes new members to a public channel when they post their first introduction.",
+    "description": "Watches a designated introductions channel for a new member's first message, promotes them to an active member role, removes their new member role, and reposts a welcome embed in a public channel crediting the original poster.",
+    "install_msg": "Thanks for installing RanchIntro! Get started with `[p]ri settings` and `[p]help ranchintro`.",
+    "author": ["nerdbarbie"],
+    "required_cogs": {},
+    "requirements": [],
+    "tags": ["welcome", "roles", "introductions", "utility"],
+    "min_bot_version": "3.5.0",
+    "end_user_data_statement": "This cog does not store any end user data. Role changes and welcome posts are performed in real-time."
+}
