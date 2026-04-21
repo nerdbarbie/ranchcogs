@@ -1,25 +1,35 @@
 {
     "author": ["nerdbarbie"],
-    "description": "Ranch Cogs",
+    "description": "Ranch Cogs — a collection of custom cogs for Red-DiscordBot.",
     "install_msg": "Thanks for installing Ranch Cogs!",
     "short": "Ranch Cogs",
     "cogs": {
         "impostergate": {
             "author": ["nerdbarbie"],
-            "description": "...",
-            "short": "...",
+            "short": "Imposter detection and gating.",
+            "description": "Imposter detection and gating.",
+            "tags": ["moderation", "utility"],
             "min_bot_version": "3.5.0"
         },
         "turdkick": {
             "author": ["nerdbarbie"],
-            "description": "...",
-            "short": "...",
+            "short": "Automated kick utility.",
+            "description": "Automated kick utility.",
+            "tags": ["moderation", "utility"],
             "min_bot_version": "3.5.0"
         },
         "cattleguard": {
             "author": ["nerdbarbie"],
-            "description": "Role management: default role assignment and inactivity-based role transitions.",
             "short": "Inactivity-based role management.",
+            "description": "Automatically assigns a default role to members with no roles, and moves members between roles based on configurable inactivity thresholds. Supports multiple inactivity rules and a scheduled background check.",
+            "tags": ["roles", "moderation", "utility", "activity"],
+            "min_bot_version": "3.5.0"
+        },
+        "ranchintro": {
+            "author": ["nerdbarbie"],
+            "short": "Welcomes new members when they post their first introduction.",
+            "description": "Watches a designated introductions channel for a new member's first message, promotes them to an active member role, removes their new member role, and reposts a welcome embed in a public channel crediting the original poster.",
+            "tags": ["welcome", "roles", "introductions", "utility"],
             "min_bot_version": "3.5.0"
         }
     }
