@@ -1,0 +1,12 @@
+{
+    "name": "CattleGuard",
+    "short": "Role management: default role assignment and inactivity-based role transitions.",
+    "description": "Automatically assigns a default role to members with no roles, and moves members between roles based on configurable inactivity thresholds. Supports multiple inactivity rules and a scheduled background check.",
+    "install_msg": "Thanks for installing CattleGuard! Get started with `[p]cg settings` and `[p]help cattleguard`.",
+    "author": ["nerdbarbie"],
+    "required_cogs": {},
+    "requirements": [],
+    "tags": ["roles", "moderation", "utility", "activity"],
+    "min_bot_version": "3.5.0",
+    "end_user_data_statement": "This cog does not store any end user data. Role changes are performed in real-time."
+}
