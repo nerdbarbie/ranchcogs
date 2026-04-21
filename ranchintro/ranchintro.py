@@ -237,6 +237,50 @@ class RanchIntro(commands.Cog):
         await self.config.guild(ctx.guild).log_channel.set(None)
         await ctx.send("✅ Log channel cleared.")
 
+
+    @ranchintro.command(name="fixroles")
+    async def ri_fix_roles(self, ctx: commands.Context):
+        """
+        Sweep all members and remove the remove-role from anyone who already
+        has the add-role. Safe to run at any time — no messages are posted.
+
+        Example: `[p]ri fixroles`
+        """
+        cfg = self.config.guild(ctx.guild)
+        active_role_id = await cfg.active_role()
+        new_member_role_id = await cfg.new_member_role()
+
+        if not active_role_id or not new_member_role_id:
+            return await ctx.send("❌ Both `setaddrole` and `setremoverole` must be configured first.")
+
+        active_role = ctx.guild.get_role(active_role_id)
+        new_member_role = ctx.guild.get_role(new_member_role_id)
+
+        if not active_role:
+            return await ctx.send("❌ Add-role not found — it may have been deleted.")
+        if not new_member_role:
+            return await ctx.send("❌ Remove-role not found — it may have been deleted.")
+
+        await ctx.send("⏳ Scanning members...")
+
+        cleaned = 0
+        failed = 0
+
+        for member in ctx.guild.members:
+            if member.bot:
+                continue
+            if active_role in member.roles and new_member_role in member.roles:
+                try:
+                    await member.remove_roles(new_member_role, reason="RanchIntro fixroles sweep")
+                    cleaned += 1
+                except (discord.Forbidden, discord.HTTPException):
+                    failed += 1
+
+        parts = [f"✅ Done. Cleaned up **{cleaned}** member(s)."]
+        if failed:
+            parts.append(f"⚠️ Failed to update **{failed}** member(s) — check bot permissions.")
+        await ctx.send(" ".join(parts))
+
     @ranchintro.command(name="settings")
     async def ri_settings(self, ctx: commands.Context):
         """Display current RanchIntro settings for this server."""
