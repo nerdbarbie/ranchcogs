@@ -131,7 +131,6 @@ class RanchIntro(commands.Cog):
             name=member.display_name,
             icon_url=member.display_avatar.url,
         )
-        embed.set_footer(text=f"@{member.name}")
 
         try:
             await welcome_channel.send(
